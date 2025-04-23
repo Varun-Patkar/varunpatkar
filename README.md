@@ -16,7 +16,13 @@ A modern, responsive portfolio website showcasing Varun Patkar's skills, project
 - **Dark/Light Mode**: Theme toggle with smooth transition effects
 - **Interactive 3D Elements**: Optional 3D logo visualization using Three.js
 - **Integrated Contact Form**: Email contact functionality via Google Apps Script
-- **WebLLM Chatbot**: AI assistant to help visitors navigate the portfolio
+- **WebLLM Agentic Chatbot**: AI assistant with ability to perform actions:
+  - **Direct Navigation**: Can scroll to any section of the portfolio
+  - **Theme Switching**: Can toggle between light and dark modes
+  - **Smart Link Opening**: Can open GitHub, LinkedIn, or project links in new tabs
+  - **Form Assistance**: Can help fill out the contact form based on conversation
+  - **Contextual Awareness**: Understands which section you're viewing and current theme
+  - **On-Device Processing**: Uses WebLLM for privacy and no server dependency
 - **Project Showcase**: Highlighting projects with live demos, code links, and video demonstrations
 - **Smooth Animations**: Using Framer Motion for engaging UI interactions
 - **Accessible**: Built with accessibility in mind
@@ -77,6 +83,12 @@ A modern, responsive portfolio website showcasing Varun Patkar's skills, project
 ## 💡 Implementation Notes
 
 - The chatbot uses WebLLM to run AI directly in the browser without server calls
+- **Agentic Chat Features**:
+  - Implemented custom action parsing from LLM responses using the format: `[ACTION:type:data]`
+  - User confirmation UI for all agent actions to ensure control and transparency
+  - Context-aware theme toggling that understands current theme state
+  - Section-aware navigation that provides relevant information based on current view
+  - Form-filling capabilities that respect user privacy and require explicit approval
 - The theme transition uses a circular reveal effect for a smoother experience
 - The 3D model can be toggled off for performance on lower-end devices
 
