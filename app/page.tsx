@@ -5,8 +5,9 @@ import Projects from "@/components/Projects";
 import Experience from "@/components/Experience";
 import Education from "@/components/Education";
 import Contact from "@/components/Contact";
-import Chatbot from "@/components/Chatbot"; // Import the Chatbot component
-import { Toaster } from "@/components/ui/toaster"; // Import Toaster
+import Chatbot from "@/components/Chatbot";
+import { Toaster as SonnerToaster } from "@/components/ui/sonner"; // Use Sonner for the reminder
+import ChatbotReminder from "@/components/ChatbotReminder"; // Import the reminder component
 
 export default function Home() {
 	return (
@@ -18,8 +19,9 @@ export default function Home() {
 			<Experience />
 			<Education />
 			<Contact />
-			<Chatbot /> {/* Render the Chatbot component */}
-			<Toaster /> {/* Add Toaster here */}
+			<Chatbot />
+			<SonnerToaster /> {/* Ensure Sonner is rendered */}
+			<ChatbotReminder /> {/* Render the reminder component */}
 		</div>
 	);
 }

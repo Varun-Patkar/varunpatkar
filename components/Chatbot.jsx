@@ -875,15 +875,18 @@ export default function Chatbot() {
 			<AnimatePresence>
 				{isOpen && (
 					<motion.div
-						// Increased width
-						className="fixed bottom-8 right-8 z-[100] w-[450px] h-[650px] sm:w-[550px] sm:h-[700px]"
+						// Mobile: Fullscreen fixed. Desktop: Bottom-right fixed.
+						// Use inset-0 for mobile, override with md:inset-auto etc. for desktop.
+						className="fixed inset-0 z-[100] flex items-center justify-center bg-black/30 backdrop-blur-sm md:items-end md:justify-end md:inset-auto md:bottom-5 md:right-5 md:h-auto md:w-auto md:bg-transparent md:backdrop-blur-none"
 						initial={{ opacity: 0, y: 50, scale: 0.9 }}
 						animate={{ opacity: 1, y: 0, scale: 1 }}
 						exit={{ opacity: 0, y: 50, scale: 0.9 }}
 						transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
 					>
 						{/* Added subtle gradient background to the card */}
-						<Card className="h-full flex flex-col shadow-2xl border-primary/30 rounded-xl overflow-hidden bg-gradient-to-br from-background via-background to-muted/20">
+						<Card className="h-full w-full flex flex-col shadow-2xl border-primary/30 rounded-none overflow-hidden bg-gradient-to-br from-background via-background to-muted/20 md:rounded-xl md:w-[25vw] md:h-[50vh]">
+							{" "}
+							{/* Use fixed pixel dimensions */} {/* Adjusted desktop size */}
 							{/* Header with gradient */}
 							<CardHeader className="flex flex-row items-center justify-between p-4 border-b bg-gradient-to-r from-purple-600/10 to-pink-600/10 backdrop-blur-sm">
 								<div className="flex items-center gap-3">
@@ -937,7 +940,6 @@ export default function Chatbot() {
 									</Tooltip>
 								</div>
 							</CardHeader>
-
 							{/* Content Area with more padding */}
 							<CardContent className="flex-1 overflow-y-auto p-5 space-y-5">
 								{messages.map((msg, index) => {
@@ -1078,7 +1080,6 @@ export default function Chatbot() {
 								)}
 								<div ref={messagesEndRef} /> {/* Scroll target */}
 							</CardContent>
-
 							{/* Footer with slightly more padding */}
 							<CardFooter className="p-4 border-t bg-muted/30">
 								<form

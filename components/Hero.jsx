@@ -2,13 +2,24 @@
 
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { ArrowDownIcon } from "lucide-react";
+import {
+	ArrowDownIcon,
+	MousePointer2Icon,
+	MoveIcon,
+	ZoomInIcon,
+} from "lucide-react";
 import HeroCanvas from "./HeroCanvas";
 import { Suspense, useState, useEffect } from "react";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { useTheme } from "next-themes";
 import { portfolioData } from "@/lib/portfolio-data"; // Import portfolio data
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipProvider,
+	TooltipTrigger,
+} from "@/components/ui/tooltip"; // Import Tooltip components
 
 export default function Hero() {
 	const [show3D, setShow3D] = useState(false);
@@ -79,6 +90,31 @@ export default function Hero() {
 							/>
 						)}
 					</div>
+					{/* 3D View Instructions (Conditional) */}
+					{mounted && show3D && (
+						<motion.div
+							initial={{ opacity: 0, height: 0 }}
+							animate={{ opacity: 1, height: "auto" }}
+							exit={{ opacity: 0, height: 0 }}
+							transition={{ duration: 0.3 }}
+							className="text-xs text-muted-foreground text-center mb-3 space-y-1 z-10"
+						>
+							<p className="flex items-center justify-center gap-1">
+								<MousePointer2Icon className="w-3 h-3 inline-block" />
+								<span className="font-semibold">Left Click + Drag:</span> Orbit
+								around
+							</p>
+							<p className="flex items-center justify-center gap-1">
+								<MoveIcon className="w-3 h-3 inline-block" />
+								<span className="font-semibold">Right Click + Drag:</span> Pan
+								view
+							</p>
+							<p className="flex items-center justify-center gap-1">
+								<ZoomInIcon className="w-3 h-3 inline-block" />
+								<span className="font-semibold">Scroll Wheel:</span> Zoom in/out
+							</p>
+						</motion.div>
+					)}
 				</div>
 
 				{/* Right Column: Hero Content */}
@@ -122,24 +158,40 @@ export default function Hero() {
 						{portfolioData.about.short} {/* Use data from import */}
 					</motion.p>
 
-					{/* Buttons */}
-					<motion.div
-						initial={{ opacity: 0, y: 20 }}
-						animate={{ opacity: 1, y: 0 }}
-						transition={{ duration: 0.5, delay: 0.6 }}
-						className="flex flex-col sm:flex-row gap-4 w-full justify-center"
-					>
-						<Button
-							size="lg"
-							className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
-							asChild
+					{/* Buttons - Wrap the whole section in TooltipProvider */}
+					<TooltipProvider>
+						<motion.div
+							initial={{ opacity: 0, y: 20 }}
+							animate={{ opacity: 1, y: 0 }}
+							transition={{ duration: 0.5, delay: 0.6 }}
+							className="flex flex-col sm:flex-row gap-4 w-full justify-center"
 						>
-							<a href="#projects">View My Work</a>
-						</Button>
-						<Button size="lg" variant="outline">
-							Download Resume
-						</Button>
-					</motion.div>
+							<Button
+								size="lg"
+								className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+								asChild
+							>
+								<a href="#projects">View My Work</a>
+							</Button>
+
+							{/* Tooltip for Download Resume */}
+							<Tooltip>
+								{/* Attach trigger directly to the button */}
+								<TooltipTrigger asChild>
+									<Button
+										size="lg"
+										variant="outline"
+										onClick={(e) => e.preventDefault()}
+									>
+										Download Resume
+									</Button>
+								</TooltipTrigger>
+								<TooltipContent>
+									<p>Updation in Progress!</p>
+								</TooltipContent>
+							</Tooltip>
+						</motion.div>
+					</TooltipProvider>
 				</div>
 			</div>
 
