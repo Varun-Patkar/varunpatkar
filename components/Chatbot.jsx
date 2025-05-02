@@ -28,9 +28,10 @@ import {
 	TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { portfolioData, generateSystemPrompt } from "@/lib/portfolio-data"; // Import data
+import ReactMarkdown from "react-markdown"; // Import ReactMarkdown
 
 // --- Configuration ---
-const CHAT_MODEL = "Llama-3.1-8B-Instruct-q4f32_1-MLC";
+const CHAT_MODEL = "Llama-3.2-3B-Instruct-q4f16_1-MLC"; // Changed model
 const INITIAL_GREETING = `Hello! I'm Varun's AI assistant. Feel free to ask me anything about his skills, experience, or projects based on his portfolio. How can I help you today?`;
 const CONTEXT_WINDOW_SIZE = 3; // Number of recent messages to include as context
 const SECTION_IDS = [
@@ -971,13 +972,35 @@ export default function Chatbot() {
 														: "bg-muted text-foreground rounded-bl-none" // Normal assistant style
 												}`}
 											>
-												{/* Basic markdown rendering (newlines) */}
-												{msg.content.split("\n").map((line, i, arr) => (
-													<React.Fragment key={i}>
-														{line}
-														{i < arr.length - 1 && <br />}
-													</React.Fragment>
-												))}
+												{/* Conditional Markdown Rendering */}
+												{msg.role === "assistant" &&
+												!isAgenticPlaceholder &&
+												!msg.isConfirmation ? (
+													<ReactMarkdown
+														components={{
+															// Optional: Customize link rendering
+															a: ({ node, ...props }) => (
+																<a
+																	{...props}
+																	target="_blank"
+																	rel="noopener noreferrer"
+																	className="text-primary underline hover:opacity-80"
+																/>
+															),
+														}}
+													>
+														{msg.content}
+													</ReactMarkdown>
+												) : (
+													// Render plain text for user messages, placeholders, and confirmations
+													// Basic newline handling for confirmations
+													msg.content.split("\n").map((line, i, arr) => (
+														<React.Fragment key={i}>
+															{line}
+															{i < arr.length - 1 && <br />}
+														</React.Fragment>
+													))
+												)}
 
 												{/* Render Suggestions ONLY for the initial greeting */}
 												{index === 0 &&

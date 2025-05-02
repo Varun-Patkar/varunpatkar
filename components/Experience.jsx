@@ -11,37 +11,7 @@ import {
 } from "@/components/ui/card";
 import { BriefcaseIcon, CalendarIcon, MapPinIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-
-// Updated experiences
-const experiences = [
-	{
-		title: "Software Engineer 1",
-		company: "MAQ Software",
-		location: "Mumbai, MH, India",
-		period: "Aug 2022 - Present (1 yr 10 mos+)", // Adjusted period
-		description:
-			"Working as a full-time Software Engineer, focusing on data engineering and related technologies within the Microsoft ecosystem.",
-		technologies: ["Python", "SQL", "Azure", "Azure Data Factory", "C#"], // Example technologies
-	},
-	{
-		title: "Data Science and Business Analytics Intern",
-		company: "The Sparks Foundation",
-		location: "Remote",
-		period: "May 2021 - Jun 2021",
-		description:
-			"Gained practical experience in data science and business analytics through project-based tasks.",
-		technologies: ["Python", "Data Analysis", "Machine Learning"],
-	},
-	{
-		title: "Chairperson",
-		company: "CSI SFIT (College Chapter)",
-		location: "Mumbai, MH, India",
-		period: "During College", // Specify exact dates if known
-		description:
-			"Led the college chapter of the Computer Society of India, organizing events and managing activities.",
-		technologies: ["Leadership", "Event Management", "Team Coordination"],
-	},
-];
+import { portfolioData } from "@/lib/portfolio-data"; // Import portfolio data
 
 export default function Experience() {
 	const container = {
@@ -85,7 +55,8 @@ export default function Experience() {
 					viewport={{ once: true }}
 					className="space-y-6 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-purple-600 before:via-pink-600 before:to-purple-600 before:opacity-30 before:content-[''] max-w-3xl mx-auto"
 				>
-					{experiences.map((experience, index) => (
+					{/* Use portfolioData.experience */}
+					{portfolioData.experience.map((experience, index) => (
 						<motion.div
 							key={index}
 							variants={item}
@@ -111,7 +82,8 @@ export default function Experience() {
 											{/* Allow wrapping */}
 											<div className="flex items-center">
 												<CalendarIcon className="w-4 h-4 mr-1" />
-												{experience.period}
+												{experience.period}{" "}
+												{/* Now uses dynamic value from data */}
 											</div>
 											<div className="flex items-center">
 												<MapPinIcon className="w-4 h-4 mr-1" />

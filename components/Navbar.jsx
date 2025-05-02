@@ -7,6 +7,7 @@ import ThemeToggle from "./ThemeToggle";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { MenuIcon, XIcon } from "lucide-react";
+import { portfolioData } from "@/lib/portfolio-data"; // Import portfolio data
 
 const navItems = [
 	{ name: "Home", href: "#hero" },
@@ -48,7 +49,7 @@ export default function Navbar() {
 					href="#hero"
 					className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 text-transparent bg-clip-text"
 				>
-					Varun Patkar
+					{portfolioData.name} {/* Use data from import */}
 				</a>
 
 				{/* Desktop Navigation */}

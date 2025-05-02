@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { Separator } from "@/components/ui/separator";
+import { portfolioData } from "@/lib/portfolio-data"; // Import portfolio data
 
 export default function About() {
 	return (
@@ -48,11 +49,9 @@ export default function About() {
 						</h3>
 
 						<p className="text-muted-foreground leading-relaxed">
-							Hello! I'm Varun Patkar, primarily a Data Engineer/Data Analyst
-							with a strong interest in web development, especially exploring
-							technologies like Three.js and WebLLM. I enjoy leveraging AI tools
-							under my supervision to enhance my workflow and create innovative
-							solutions.
+							Hello! I'm {portfolioData.name},{" "}
+							{portfolioData.about.long.toLowerCase().substring(11)}{" "}
+							{/* Use data from import */}
 						</p>
 
 						<p className="text-muted-foreground leading-relaxed">
@@ -64,7 +63,7 @@ export default function About() {
 						<div className="flex flex-wrap gap-4 pt-2">
 							<div className="flex flex-col">
 								<span className="text-3xl font-bold text-purple-600 dark:text-purple-400">
-									2+
+									{portfolioData.about.yearsExperience} {/* Use data */}
 								</span>
 								<span className="text-sm text-muted-foreground">
 									Years Experience
@@ -72,7 +71,7 @@ export default function About() {
 							</div>
 							<div className="flex flex-col">
 								<span className="text-3xl font-bold text-pink-600 dark:text-pink-400">
-									20+
+									{portfolioData.about.projectsCompleted} {/* Use data */}
 								</span>
 								<span className="text-sm text-muted-foreground">
 									Projects Completed

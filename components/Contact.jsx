@@ -10,6 +10,7 @@ import { PhoneIcon, MailIcon, MapPinIcon } from "lucide-react"; // Keep these
 // Import specific icons if needed, or use SVGs directly
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast"; // Use the correct hook import
+import { portfolioData } from "@/lib/portfolio-data"; // Import portfolio data
 
 // Define SVG for LinkedIn
 const LinkedInIcon = () => (
@@ -168,7 +169,7 @@ export default function Contact() {
 											<div>
 												<p className="font-medium">Phone</p>
 												<p className="text-muted-foreground">
-													+91 7977802884 {/* Updated Phone */}
+													{portfolioData.contact.phone}
 												</p>
 											</div>
 										</div>
@@ -180,7 +181,7 @@ export default function Contact() {
 											<div>
 												<p className="font-medium">Email</p>
 												<p className="text-muted-foreground">
-													varunpatkar501@gmail.com {/* Updated Email */}
+													{portfolioData.contact.email}
 												</p>
 											</div>
 										</div>
@@ -192,7 +193,7 @@ export default function Contact() {
 											<div>
 												<p className="font-medium">Location</p>
 												<p className="text-muted-foreground">
-													Mumbai, Maharashtra, India {/* Updated Location */}
+													{portfolioData.location}
 												</p>
 											</div>
 										</div>
@@ -204,7 +205,7 @@ export default function Contact() {
 									<div className="flex space-x-4">
 										{/* GitHub Link */}
 										<a
-											href="https://github.com/Varun-Patkar"
+											href={portfolioData.contact.github}
 											target="_blank"
 											rel="noreferrer"
 											// Add text-foreground for SVG inheritance
@@ -215,7 +216,7 @@ export default function Contact() {
 										</a>
 										{/* LinkedIn Link */}
 										<a
-											href="https://www.linkedin.com/in/varun-patkar/"
+											href={portfolioData.contact.linkedin}
 											target="_blank"
 											rel="noreferrer"
 											// Add text-foreground for SVG inheritance
@@ -226,7 +227,7 @@ export default function Contact() {
 										</a>
 										{/* Twitter (X) Link */}
 										<a
-											href="https://x.com/Varun_Patkar"
+											href={portfolioData.contact.twitter}
 											target="_blank"
 											rel="noreferrer"
 											// Add text-foreground for SVG inheritance

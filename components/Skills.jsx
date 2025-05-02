@@ -3,54 +3,7 @@
 import { motion } from "framer-motion";
 import { Separator } from "@/components/ui/separator";
 import { Card } from "@/components/ui/card";
-
-// Updated skill categories and skills
-const skillCategories = [
-	{
-		name: "Data & Backend",
-		skills: [
-			{ name: "Python", level: 85 },
-			{ name: "SQL", level: 80 },
-			{ name: "Node.js", level: 70 },
-			{ name: "Express", level: 70 },
-			{ name: "Django", level: 65 },
-			{ name: "MongoDB", level: 75 },
-			{ name: "PostgreSQL", level: 70 },
-		],
-	},
-	{
-		name: "Frontend & Web",
-		skills: [
-			{ name: "JavaScript", level: 80 }, // User prefers JS
-			{ name: "React", level: 75 },
-			{ name: "Next.js", level: 70 },
-			{ name: "Vite", level: 65 },
-			{ name: "HTML/CSS", level: 85 },
-			{ name: "Tailwind CSS", level: 80 },
-			{ name: "Three.js", level: 50 }, // Added based on interest
-		],
-	},
-	{
-		name: "Cloud & Tools",
-		skills: [
-			{ name: "Git", level: 90 },
-			{ name: "Docker", level: 70 },
-			{ name: "Microsoft Azure", level: 75 }, // Added Azure
-			{ name: "Azure Data Factory", level: 70 }, // Specific Azure service
-			{ name: "Azure OpenAI", level: 65 }, // Specific Azure service
-			{ name: "AWS", level: 50 }, // Lowered proficiency
-		],
-	},
-	{
-		name: "Other Languages",
-		skills: [
-			{ name: "C#", level: 60 }, // Adjusted level
-			{ name: "Java", level: 20 },
-			{ name: "C++", level: 20 },
-			{ name: "TypeScript", level: 50 }, // Knows but doesn't prefer
-		],
-	},
-];
+import { portfolioData } from "@/lib/portfolio-data"; // Import portfolio data
 
 export default function Skills() {
 	const container = {
@@ -86,7 +39,6 @@ export default function Skills() {
 						My technical expertise spans data engineering, analysis, and web
 						development.
 					</p>{" "}
-					{/* Updated description */}
 				</motion.div>
 
 				<motion.div
@@ -96,19 +48,21 @@ export default function Skills() {
 					viewport={{ once: true }}
 					className="grid grid-cols-1 md:grid-cols-2 gap-8"
 				>
-					{skillCategories.map((category, index) => (
+					{/* Use portfolioData.skills */}
+					{portfolioData.skills.map((category, index) => (
 						<motion.div key={index} variants={item}>
 							<Card className="p-6 h-full hover:shadow-lg transition-shadow">
 								<h3 className="text-xl font-semibold mb-4 bg-gradient-to-r from-purple-600 to-pink-600 text-transparent bg-clip-text">
-									{category.name}
+									{category.category} {/* Use category.category */}
 								</h3>
 								<div className="space-y-4">
-									{category.skills.map((skill, skillIndex) => (
+									{/* Use category.items */}
+									{category.items.map((skill, skillIndex) => (
 										<div key={skillIndex}>
 											<div className="flex justify-between mb-1">
 												<span className="font-medium">{skill.name}</span>
 												<span className="text-muted-foreground text-sm">
-													{skill.level}% {/* Display updated level */}
+													{skill.level}%
 												</span>
 											</div>
 											<div className="h-2 w-full bg-muted rounded-full overflow-hidden">

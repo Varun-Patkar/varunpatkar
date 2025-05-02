@@ -4,12 +4,21 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ArrowDownIcon } from "lucide-react";
 import HeroCanvas from "./HeroCanvas";
-import { Suspense, useState } from "react"; // Import useState
-import { Switch } from "@/components/ui/switch"; // Import Switch
-import { Label } from "@/components/ui/label"; // Import Label
+import { Suspense, useState, useEffect } from "react";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import { useTheme } from "next-themes";
+import { portfolioData } from "@/lib/portfolio-data"; // Import portfolio data
 
 export default function Hero() {
-	const [show3D, setShow3D] = useState(false); // State to toggle 3D view
+	const [show3D, setShow3D] = useState(false);
+	const { resolvedTheme } = useTheme();
+	const [mounted, setMounted] = useState(false); // Add mounted state
+
+	// Ensure component is mounted before rendering theme-dependent content
+	useEffect(() => {
+		setMounted(true);
+	}, []);
 
 	return (
 		<section
@@ -45,32 +54,40 @@ export default function Hero() {
 
 					{/* Conditional Rendering Area */}
 					<div className="relative h-[300px] md:h-[600px] w-full">
-						{show3D ? (
+						{!mounted ? (
+							// Show loading state or placeholder until mounted
+							<div className="w-full h-full flex items-center justify-center">
+								<div className="animate-pulse bg-muted rounded-md w-4/5 h-4/5"></div>
+							</div>
+						) : show3D ? (
 							<Suspense fallback={null}>
 								<HeroCanvas />
 							</Suspense>
 						) : (
 							<motion.img
-								src="/varungradient.png" // Path to your static image
-								alt="Varun Patkar Logo Gradient"
-								className="w-full h-full object-contain" // Use contain to prevent distortion
+								src={
+									resolvedTheme === "dark"
+										? "/darkmode.png"
+										: "/varungradient.png"
+								}
+								alt="Varun Patkar Logo"
+								className="w-full h-full object-contain"
 								initial={{ opacity: 0 }}
 								animate={{ opacity: 1 }}
 								transition={{ duration: 0.5 }}
+								key={resolvedTheme} // Force re-render on theme change
 							/>
 						)}
 					</div>
 				</div>
 
 				{/* Right Column: Hero Content */}
-				{/* Ensure items-center is always applied, remove md:items-start */}
 				<div className="flex flex-col items-center text-center md:text-left">
 					{/* Profile Image Div */}
 					<motion.div
 						initial={{ opacity: 0, y: 20 }}
 						animate={{ opacity: 1, y: 0 }}
 						transition={{ duration: 0.5 }}
-						// Remove mx-auto md:mx-0, parent div now handles centering
 						className="mb-8 overflow-hidden rounded-full border-4 border-primary/20 p-1 bg-background/50 backdrop-blur-sm"
 					>
 						<div className="h-48 w-48 rounded-full bg-muted overflow-hidden">
@@ -91,7 +108,7 @@ export default function Hero() {
 					>
 						Hi, I'm{" "}
 						<span className="bg-gradient-to-r from-purple-600 to-pink-600 text-transparent bg-clip-text">
-							Varun Patkar
+							{portfolioData.name} {/* Use data from import */}
 						</span>
 					</motion.h1>
 
@@ -102,8 +119,7 @@ export default function Hero() {
 						transition={{ duration: 0.5, delay: 0.4 }}
 						className="text-lg md:text-xl text-muted-foreground mb-8 max-w-xl text-shadow"
 					>
-						A Data Engineer/Analyst exploring web development with technologies
-						like Three.js and WebLLM, and leveraging AI.
+						{portfolioData.about.short} {/* Use data from import */}
 					</motion.p>
 
 					{/* Buttons */}
@@ -111,7 +127,6 @@ export default function Hero() {
 						initial={{ opacity: 0, y: 20 }}
 						animate={{ opacity: 1, y: 0 }}
 						transition={{ duration: 0.5, delay: 0.6 }}
-						// Removed md:justify-start to keep buttons centered
 						className="flex flex-col sm:flex-row gap-4 w-full justify-center"
 					>
 						<Button

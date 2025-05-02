@@ -10,20 +10,7 @@ import {
 	CardDescription,
 } from "@/components/ui/card";
 import { GraduationCapIcon, CalendarIcon, MapPinIcon } from "lucide-react";
-
-// Updated education details
-const educations = [
-	{
-		degree: "Bachelor of Engineering in Information Technology",
-		institution: "St. Francis Institute of Technology (Mumbai University)", // Added college name
-		location: "Mumbai, MH, India",
-		period: "2018 - 2022", // Assuming standard 4-year duration, adjust if needed
-		description:
-			"Completed coursework with a focus on IT fundamentals and software development. Actively involved in extracurricular activities, including leading the CSI SFIT chapter.",
-		gpa: "9.1/10.0", // Updated CGPA format
-	},
-	// Add High School or other relevant education if desired
-];
+import { portfolioData } from "@/lib/portfolio-data"; // Import portfolio data
 
 export default function Education() {
 	const container = {
@@ -67,7 +54,8 @@ export default function Education() {
 					viewport={{ once: true }}
 					className="grid grid-cols-1 gap-6 max-w-3xl mx-auto"
 				>
-					{educations.map((education, index) => (
+					{/* Use portfolioData.education */}
+					{portfolioData.education.map((education, index) => (
 						<motion.div key={index} variants={item}>
 							<Card className="hover:shadow-lg transition-shadow overflow-hidden">
 								<CardHeader className="pb-2 flex flex-row items-start gap-4">

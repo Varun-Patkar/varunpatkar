@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Separator } from "@/components/ui/separator";
 import { HeartIcon } from "lucide-react";
 import { motion } from "framer-motion";
+import { portfolioData } from "@/lib/portfolio-data"; // Import portfolio data
 
 // Define navItems here, matching the Navbar
 const navItems = [
@@ -34,10 +35,10 @@ export default function Footer() {
 								href="#hero"
 								className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 text-transparent bg-clip-text"
 							>
-								Varun Patkar
+								{portfolioData.name} {/* Use data */}
 							</Link>
 							<p className="mt-2 text-muted-foreground">
-								Data Engineer/Analyst exploring web development and AI.
+								{portfolioData.about.short} {/* Use data */}
 							</p>
 						</motion.div>
 					</div>
@@ -77,7 +78,7 @@ export default function Footer() {
 							<ul className="space-y-2">
 								<li>
 									<a
-										href="https://github.com/Varun-Patkar"
+										href={portfolioData.contact.github}
 										target="_blank"
 										rel="noreferrer"
 										className="text-muted-foreground hover:text-foreground transition-colors"
@@ -87,7 +88,7 @@ export default function Footer() {
 								</li>
 								<li>
 									<a
-										href="https://www.linkedin.com/in/varun-patkar/"
+										href={portfolioData.contact.linkedin}
 										target="_blank"
 										rel="noreferrer"
 										className="text-muted-foreground hover:text-foreground transition-colors"
@@ -97,7 +98,7 @@ export default function Footer() {
 								</li>
 								<li>
 									<a
-										href="https://x.com/Varun_Patkar"
+										href={portfolioData.contact.twitter}
 										target="_blank"
 										rel="noreferrer"
 										className="text-muted-foreground hover:text-foreground transition-colors"
@@ -114,7 +115,8 @@ export default function Footer() {
 
 				<div className="flex flex-col sm:flex-row items-center justify-between">
 					<p className="text-sm text-muted-foreground">
-						© {currentYear} Varun Patkar. All rights reserved.
+						© {currentYear} {portfolioData.name}. All rights reserved.{" "}
+						{/* Use data */}
 					</p>
 					<p className="text-sm text-muted-foreground mt-4 sm:mt-0">
 						Made with{" "}
