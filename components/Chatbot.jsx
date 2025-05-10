@@ -29,6 +29,7 @@ import {
 	AlertDialogFooter,
 	AlertDialogHeader,
 	AlertDialogTitle,
+	AlertDialogTrigger, // Added for potential direct trigger if needed, though we'll control via state
 } from "@/components/ui/alert-dialog";
 import {
 	RotateCcwIcon,
@@ -55,24 +56,17 @@ import ReactMarkdown from "react-markdown"; // Import ReactMarkdown
 // --- Configuration ---
 const MODELS = [
 	{
-		id: "SmolLM2-1.7B-Instruct-q4f16_1-MLC", // Updated ID
-		name: "SmolLM2 1.7B", // Updated Name
-		description: "Lightest, best for mobile.",
-		mobileFriendly: true,
-		icon: SmartphoneIcon,
-	},
-	{
 		id: "Llama-3.2-3B-Instruct-q4f16_1-MLC",
 		name: "Llama 3.2 3B",
 		description: "Balanced performance (Recommended).",
-		mobileFriendly: false,
+		mobileFriendly: true, // This model can run on mobile
 		icon: ZapIcon,
 	},
 	{
 		id: "Llama-3.1-8B-Instruct-q4f16_1-MLC",
 		name: "Llama 3.1 8B",
 		description: "Best quality, resource intensive.",
-		mobileFriendly: false,
+		mobileFriendly: false, // This model is too heavy for mobile
 		icon: RocketIcon,
 	},
 ];
@@ -142,12 +136,15 @@ export default function Chatbot() {
 	const messagesRef = useRef(messages); // <<< Move messagesRef declaration here
 
 	const [isMobile, setIsMobile] = useState(false);
-	const [selectedModelId, setSelectedModelId] = useState(MODELS[1].id); // Default to medium
+	const [selectedModelId, setSelectedModelId] = useState(MODELS[0].id); // Default to the first model
 	const [modelChangeConfirmation, setModelChangeConfirmation] = useState({
 		open: false,
 		newModelId: null,
 		newModelName: "",
 	});
+	const [showMobilePerformanceWarning, setShowMobilePerformanceWarning] =
+		useState(false);
+	const mobileWarningConfirmedThisSession = useRef(false);
 
 	useEffect(() => {
 		const mobileCheck =
@@ -155,14 +152,9 @@ export default function Chatbot() {
 				navigator.userAgent
 			) || window.innerWidth < 768;
 		setIsMobile(mobileCheck);
-		if (mobileCheck && selectedModelId !== MODELS[0].id) {
-			// Only change if not already tiny
-			setSelectedModelId(MODELS[0].id);
-		} else if (!mobileCheck && selectedModelId === MODELS[0].id) {
-			// If desktop and was tiny, switch to medium
-			setSelectedModelId(MODELS[1].id);
-		}
-		// If already on a non-tiny model on desktop, or tiny on mobile, no change needed here.
+		// Always default to the first model (recommended one).
+		// The heavy model will be disabled in the SelectItem on mobile.
+		setSelectedModelId(MODELS[0].id);
 	}, []); // Runs once on mount
 
 	const scrollToBottom = () => {
@@ -222,6 +214,25 @@ export default function Chatbot() {
 				}
 				return;
 			}
+			// Do not initialize if on mobile and warning was cancelled
+			if (
+				isMobile &&
+				!mobileWarningConfirmedThisSession.current &&
+				!modelIdToLoad
+			) {
+				// This case might occur if isOpen is true but model loading was cancelled.
+				// Ensure we don't try to load if modelIdToLoad is not explicitly passed after warning.
+				console.log("Mobile warning not confirmed, skipping initialization.");
+				setMessages([
+					{
+						role: "assistant",
+						content: "AI Assistant is not active. Model loading was cancelled.",
+					},
+				]);
+				setIsLoading(false);
+				return;
+			}
+
 			isInitializing.current = true;
 			setIsLoading(true);
 			setError(null);
@@ -272,21 +283,50 @@ export default function Chatbot() {
 				isInitializing.current = false;
 			}
 		},
-		[engine] // engine dependency is crucial here
+		[engine, isMobile] // Added isMobile to dependencies
 	);
 
 	// Effect to handle WebLLM initialization based on isOpen and selectedModelId
 	useEffect(() => {
-		if (isOpen && selectedModelId) {
-			// initializeWebLLM has internal checks for existing engine or ongoing initialization
+		// Only initialize if chat is open AND (it's not mobile OR mobile warning has been confirmed)
+		if (
+			isOpen &&
+			selectedModelId &&
+			(!isMobile || mobileWarningConfirmedThisSession.current)
+		) {
 			initializeWebLLM(selectedModelId);
 		}
-	}, [isOpen, selectedModelId, initializeWebLLM]);
+	}, [isOpen, selectedModelId, initializeWebLLM, isMobile]); // Added isMobile
 
 	// --- Event Handlers ---
 	const handleOpenChat = () => {
-		setIsOpen(true);
-		// Initialization is now handled by the useEffect above
+		if (isMobile && !mobileWarningConfirmedThisSession.current) {
+			setShowMobilePerformanceWarning(true);
+		} else {
+			setIsOpen(true); // This will trigger initialization via useEffect if conditions met
+		}
+	};
+
+	const handleMobilePerformanceWarningConfirm = (confirm) => {
+		setShowMobilePerformanceWarning(false);
+		if (confirm) {
+			mobileWarningConfirmedThisSession.current = true;
+			setIsOpen(true); // Now open chat and let useEffect initialize
+		} else {
+			// User cancelled. Open chat but show a message that AI is not active.
+			setIsOpen(true); // Open the chat window
+			setMessages([
+				{
+					role: "assistant",
+					content:
+						"Okay, the AI Assistant will not be loaded due to performance concerns on mobile. You can close this window.",
+				},
+			]);
+			// Ensure engine remains null, isLoading is false. Input will be disabled.
+			setEngine(null);
+			setIsReady(false);
+			setIsLoading(false);
+		}
 	};
 
 	const handleCloseChat = () => {
@@ -316,7 +356,24 @@ export default function Chatbot() {
 			setEngine(null); // This will trigger re-render and new initializeWebLLM via useEffect if needed
 		}
 
-		setMessages([{ role: "assistant", content: INITIAL_GREETING }]);
+		setMessages((prevMessages) => {
+			// If chat is being reset and the AI was not active due to mobile warning cancellation,
+			// keep a similar inactive message instead of INITIAL_GREETING.
+			if (
+				isOpen &&
+				isMobile &&
+				!mobileWarningConfirmedThisSession.current &&
+				!engine
+			) {
+				return [
+					{
+						role: "assistant",
+						content: "AI Assistant is not active. Model loading was cancelled.",
+					},
+				];
+			}
+			return [{ role: "assistant", content: INITIAL_GREETING }];
+		});
 		setIsReady(false);
 		setError(null);
 		setPendingAction(null);
@@ -329,10 +386,23 @@ export default function Chatbot() {
 		} else {
 			// Manual reset
 			if (isOpen) {
-				// If chat is open, useEffect will trigger initializeWebLLM which will set loading states.
-				// We can set a temporary message.
-				setIsLoading(true);
-				setLoadingMessage("Resetting chat...");
+				// If chat is open, and either not mobile or warning confirmed, re-initialize.
+				if (!isMobile || mobileWarningConfirmedThisSession.current) {
+					setIsLoading(true);
+					setLoadingMessage("Resetting chat...");
+					// initializeWebLLM will be called by useEffect due to state changes if selectedModelId is set
+				} else {
+					// Is mobile and warning was not confirmed (or was cancelled)
+					setIsLoading(false);
+					setLoadingMessage("");
+					setMessages([
+						{
+							role: "assistant",
+							content:
+								"AI Assistant is not active. Model loading was cancelled.",
+						},
+					]);
+				}
 			} else {
 				// If chat is closed, no immediate re-initialization. Clear loading.
 				setIsLoading(false);
@@ -343,6 +413,18 @@ export default function Chatbot() {
 
 	const handleModelChangeRequest = (newModelId) => {
 		if (newModelId === selectedModelId) return;
+
+		// If on mobile and trying to select the heavy model (which should be disabled, but as a safeguard)
+		const newModelInfo = MODELS.find((m) => m.id === newModelId);
+		if (isMobile && newModelInfo && !newModelInfo.mobileFriendly) {
+			// Optionally, show an alert or simply don't allow selection
+			console.warn(
+				"Attempted to select a non-mobile-friendly model on a mobile device."
+			);
+			// Add a message to user? For now, rely on it being disabled in dropdown.
+			return;
+		}
+
 		const newModel = MODELS.find((m) => m.id === newModelId);
 		if (newModel) {
 			setModelChangeConfirmation({
@@ -630,13 +712,25 @@ export default function Chatbot() {
 			if (!engine || !isReady) {
 				// Added !isReady check
 				setError("AI Assistant is not ready yet.");
-				setMessages((prev) => [
-					...prev,
-					{
-						role: "assistant",
-						content: "I'm still starting up, please wait a moment!",
-					},
-				]);
+				// Check if it's not ready because user cancelled mobile warning
+				if (isMobile && !mobileWarningConfirmedThisSession.current) {
+					setMessages((prev) => [
+						...prev,
+						{
+							role: "assistant",
+							content:
+								"The AI Assistant is not active. Please confirm model loading if you wish to use it on mobile.",
+						},
+					]);
+				} else {
+					setMessages((prev) => [
+						...prev,
+						{
+							role: "assistant",
+							content: "I'm still starting up, please wait a moment!",
+						},
+					]);
+				}
 				setIsLoading(false);
 				return;
 			}
@@ -955,6 +1049,7 @@ export default function Chatbot() {
 			generateSystemPrompt,
 			setTheme,
 			isReady, // Added isReady
+			isMobile, // Added isMobile
 			// Removed pendingAction dependency here as it's cleared immediately now
 		]
 	);
@@ -1243,7 +1338,9 @@ export default function Chatbot() {
 												{/* Render Suggestions ONLY for the initial greeting */}
 												{index === 0 &&
 													msg.role === "assistant" &&
-													msg.content === INITIAL_GREETING && (
+													msg.content === INITIAL_GREETING &&
+													engine &&
+													isReady && ( // Only show suggestions if AI is active
 														<div className="mt-4 flex flex-wrap gap-2">
 															{SUGGESTIONS.map((suggestion, sIndex) => (
 																<Button
@@ -1295,7 +1392,13 @@ export default function Chatbot() {
 									);
 								})}
 								{/* Loading/Error Indicator */}
-								{(isLoading || error) && (
+								{(isLoading ||
+									error ||
+									(isOpen &&
+										!engine &&
+										!isLoading &&
+										isMobile &&
+										!mobileWarningConfirmedThisSession.current)) && (
 									<div className="flex justify-center items-center text-muted-foreground text-sm py-3">
 										{isLoading && !error && (
 											<>
@@ -1312,6 +1415,18 @@ export default function Chatbot() {
 											</>
 										)}
 										{error && <p className="text-destructive">{error}</p>}
+										{/* Message if user cancelled mobile warning and chat is open but no engine */}
+										{isOpen &&
+											!engine &&
+											!isLoading &&
+											!error &&
+											isMobile &&
+											!mobileWarningConfirmedThisSession.current && (
+												<p>
+													AI Assistant is not active. Model loading was
+													cancelled.
+												</p>
+											)}
 									</div>
 								)}
 								<div ref={messagesEndRef} /> {/* Scroll target */}
@@ -1389,6 +1504,40 @@ export default function Chatbot() {
 							className="bg-primary hover:bg-primary/90"
 						>
 							Confirm & Reload
+						</AlertDialogAction>
+					</AlertDialogFooter>
+				</AlertDialogContent>
+			</AlertDialog>
+
+			{/* Mobile Performance Warning Dialog */}
+			<AlertDialog
+				open={showMobilePerformanceWarning}
+				onOpenChange={setShowMobilePerformanceWarning} // Allow closing by clicking outside, though buttons are primary
+			>
+				<AlertDialogContent className="z-[150]">
+					<AlertDialogHeader>
+						<AlertDialogTitle>Performance Notice</AlertDialogTitle>
+						<AlertDialogDescription>
+							The AI models used by this assistant are resource-intensive and
+							may perform slowly or cause your browser to become unresponsive on
+							some mobile devices.
+							<br />
+							<br />
+							For the best experience, using a desktop computer is recommended.
+							Do you want to proceed with loading the AI model on this device?
+						</AlertDialogDescription>
+					</AlertDialogHeader>
+					<AlertDialogFooter>
+						<AlertDialogCancel
+							onClick={() => handleMobilePerformanceWarningConfirm(false)}
+						>
+							Cancel
+						</AlertDialogCancel>
+						<AlertDialogAction
+							onClick={() => handleMobilePerformanceWarningConfirm(true)}
+							className="bg-primary hover:bg-primary/90"
+						>
+							Proceed Anyway
 						</AlertDialogAction>
 					</AlertDialogFooter>
 				</AlertDialogContent>
