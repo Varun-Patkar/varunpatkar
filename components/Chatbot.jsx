@@ -12,13 +12,35 @@ import {
 	CardFooter,
 } from "@/components/ui/card";
 import {
+	Select,
+	SelectContent,
+	SelectGroup,
+	SelectItem,
+	SelectLabel,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
+import {
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
 	RotateCcwIcon,
 	SendIcon,
-	BotIcon,
 	UserIcon,
 	SparklesIcon, // Added for visual flair
 	CheckIcon,
 	XIcon as CloseIcon, // Rename XIcon import
+	CpuIcon, // For model selection
+	SmartphoneIcon, // For mobile model
+	ZapIcon, // For recommended model
+	RocketIcon, // For high-end model
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -31,7 +53,30 @@ import { portfolioData, generateSystemPrompt } from "@/lib/portfolio-data"; // I
 import ReactMarkdown from "react-markdown"; // Import ReactMarkdown
 
 // --- Configuration ---
-const CHAT_MODEL = "Llama-3.2-3B-Instruct-q4f16_1-MLC"; // Changed model
+const MODELS = [
+	{
+		id: "SmolLM2-1.7B-Instruct-q4f16_1-MLC", // Updated ID
+		name: "SmolLM2 1.7B", // Updated Name
+		description: "Lightest, best for mobile.",
+		mobileFriendly: true,
+		icon: SmartphoneIcon,
+	},
+	{
+		id: "Llama-3.2-3B-Instruct-q4f16_1-MLC",
+		name: "Llama 3.2 3B",
+		description: "Balanced performance (Recommended).",
+		mobileFriendly: false,
+		icon: ZapIcon,
+	},
+	{
+		id: "Llama-3.1-8B-Instruct-q4f16_1-MLC",
+		name: "Llama 3.1 8B",
+		description: "Best quality, resource intensive.",
+		mobileFriendly: false,
+		icon: RocketIcon,
+	},
+];
+
 const INITIAL_GREETING = `Hello! I'm Varun's AI assistant. Feel free to ask me anything about his skills, experience, or projects based on his portfolio. How can I help you today?`;
 const CONTEXT_WINDOW_SIZE = 3; // Number of recent messages to include as context
 const SECTION_IDS = [
@@ -96,6 +141,30 @@ export default function Chatbot() {
 	const { setTheme, resolvedTheme } = useTheme(); // Get theme functions
 	const messagesRef = useRef(messages); // <<< Move messagesRef declaration here
 
+	const [isMobile, setIsMobile] = useState(false);
+	const [selectedModelId, setSelectedModelId] = useState(MODELS[1].id); // Default to medium
+	const [modelChangeConfirmation, setModelChangeConfirmation] = useState({
+		open: false,
+		newModelId: null,
+		newModelName: "",
+	});
+
+	useEffect(() => {
+		const mobileCheck =
+			/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+				navigator.userAgent
+			) || window.innerWidth < 768;
+		setIsMobile(mobileCheck);
+		if (mobileCheck && selectedModelId !== MODELS[0].id) {
+			// Only change if not already tiny
+			setSelectedModelId(MODELS[0].id);
+		} else if (!mobileCheck && selectedModelId === MODELS[0].id) {
+			// If desktop and was tiny, switch to medium
+			setSelectedModelId(MODELS[1].id);
+		}
+		// If already on a non-tiny model on desktop, or tiny on mobile, no change needed here.
+	}, []); // Runs once on mount
+
 	const scrollToBottom = () => {
 		messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
 	};
@@ -137,88 +206,166 @@ export default function Chatbot() {
 	}, []);
 
 	// --- WebLLM Initialization ---
-	const initializeWebLLM = useCallback(async () => {
-		if (isInitializing.current || engine) return; // Already initializing or initialized
-		isInitializing.current = true;
-		setIsLoading(true);
-		setError(null);
-		setLoadingMessage("Initializing AI Assistant...");
-		setIsReady(false); // Ensure ready is false initially
+	const initializeWebLLM = useCallback(
+		async (modelIdToLoad) => {
+			if (isInitializing.current || engine) {
+				// console.warn for debugging, but normal operation if engine exists and not initializing
+				if (engine && !isInitializing.current) {
+					// console.log("Initialization skipped: engine already exists and not initializing.");
+				} else if (isInitializing.current) {
+					console.warn("Initialization skipped: already initializing.");
+				} else if (engine) {
+					// This case should ideally not be hit if logic is correct elsewhere
+					console.warn("Initialization skipped: engine exists (unexpected).", {
+						engineExists: !!engine,
+					});
+				}
+				return;
+			}
+			isInitializing.current = true;
+			setIsLoading(true);
+			setError(null);
+			const modelBeingLoaded =
+				MODELS.find((m) => m.id === modelIdToLoad)?.name || modelIdToLoad;
+			setLoadingMessage(`Initializing ${modelBeingLoaded}...`);
+			setIsReady(false);
 
-		try {
-			const initProgressCallback = (report) => {
-				setLoadingMessage(report.text);
-			};
+			try {
+				const initProgressCallback = (report) => {
+					setLoadingMessage(report.text);
+				};
 
-			const loadedEngine = await CreateMLCEngine(CHAT_MODEL, {
-				initProgressCallback,
-			});
+				const loadedEngine = await CreateMLCEngine(modelIdToLoad, {
+					initProgressCallback,
+				});
 
-			setEngine(loadedEngine);
-			setMessages([{ role: "assistant", content: INITIAL_GREETING }]);
-			setIsReady(true); // Set ready only on full success
-			setLoadingMessage("Ready!");
-			console.log("WebLLM Engine Initialized");
-		} catch (err) {
-			console.error("WebLLM Initialization Error:", err);
-			setError(
-				`Failed to initialize AI Assistant: ${err.message}. Please try refreshing.`
-			);
-			setMessages([
-				{
-					role: "assistant",
-					content: `Sorry, I couldn't start up correctly. Please try refreshing the page. Error: ${err.message}`,
-				},
-			]);
-			setEngine(null); // Ensure engine state is null on error
-			setIsReady(false); // Explicitly set not ready on error
-		} finally {
-			setIsLoading(false);
-			isInitializing.current = false;
+				setEngine(loadedEngine);
+				// Only set initial greeting if messages are empty or only contain error/old messages
+				setMessages((prevMessages) => {
+					if (
+						prevMessages.length === 0 ||
+						prevMessages.every(
+							(m) => m.role === "assistant" && m.content.startsWith("Sorry")
+						)
+					) {
+						return [{ role: "assistant", content: INITIAL_GREETING }];
+					}
+					return prevMessages; // Keep existing messages if chat was already active
+				});
+				setIsReady(true);
+				setLoadingMessage("Ready!");
+				console.log(`WebLLM Engine Initialized with ${modelIdToLoad}`);
+			} catch (err) {
+				console.error("WebLLM Initialization Error:", err);
+				const errorMessage = `Failed to initialize AI Assistant (${modelBeingLoaded}): ${err.message}. Please try refreshing or select a different model.`;
+				setError(errorMessage);
+				setMessages([
+					{
+						role: "assistant",
+						content: `Sorry, I couldn't start up ${modelBeingLoaded} correctly. Error: ${err.message}`,
+					},
+				]);
+				setEngine(null); // Ensure engine is null on error
+				setIsReady(false);
+			} finally {
+				setIsLoading(false); // Loading is finished, successfully or not
+				isInitializing.current = false;
+			}
+		},
+		[engine] // engine dependency is crucial here
+	);
+
+	// Effect to handle WebLLM initialization based on isOpen and selectedModelId
+	useEffect(() => {
+		if (isOpen && selectedModelId) {
+			// initializeWebLLM has internal checks for existing engine or ongoing initialization
+			initializeWebLLM(selectedModelId);
 		}
-	}, [engine]); // Dependency on engine to prevent re-running if already set
+	}, [isOpen, selectedModelId, initializeWebLLM]);
 
 	// --- Event Handlers ---
 	const handleOpenChat = () => {
 		setIsOpen(true);
-		if (!engine && !isInitializing.current) {
-			initializeWebLLM(); // Initialize on first open
-		}
+		// Initialization is now handled by the useEffect above
 	};
 
 	const handleCloseChat = () => {
 		setIsOpen(false);
 	};
 
-	const handleResetChat = async () => {
-		// Attempt to interrupt if engine exists and might be loading
-		if (engine && isLoading) {
-			try {
-				await engine.interrupt();
-				console.log("Interrupted ongoing generation during reset.");
-			} catch (interruptErr) {
-				console.error("Error interrupting engine during reset:", interruptErr);
-				// Continue with reset anyway
+	const handleResetChat = async (isModelChange = false) => {
+		if (engine) {
+			if (isLoading && !isModelChange && !isInitializing.current) {
+				// Check !isInitializing
+				try {
+					await engine.interrupt();
+					console.log("Interrupted ongoing generation during reset.");
+				} catch (interruptErr) {
+					console.error(
+						"Error interrupting engine during reset:",
+						interruptErr
+					);
+				}
 			}
+			try {
+				await engine.unload();
+				console.log("Engine unloaded successfully.");
+			} catch (unloadErr) {
+				console.error("Error unloading engine:", unloadErr);
+			}
+			setEngine(null); // This will trigger re-render and new initializeWebLLM via useEffect if needed
 		}
 
-		// Reset state
-		setIsLoading(true); // Show resetting state briefly
-		setLoadingMessage("Resetting chat...");
+		setMessages([{ role: "assistant", content: INITIAL_GREETING }]);
+		setIsReady(false);
 		setError(null);
 		setPendingAction(null);
-		setMessages([{ role: "assistant", content: INITIAL_GREETING }]);
-		console.log("Chat Reset (Local State Cleared)");
+		console.log("Chat Reset (Local State Cleared, Engine Unloaded)");
 
-		// Re-evaluate readiness based on engine existence
-		// This ensures isReady is true only if the engine was successfully initialized previously
-		setIsReady(!!engine);
+		if (isModelChange) {
+			setIsLoading(true); // Indicate activity
+			setLoadingMessage("Preparing to load new model...");
+			// setSelectedModelId in handleConfirmModelChange will trigger useEffect -> initializeWebLLM
+		} else {
+			// Manual reset
+			if (isOpen) {
+				// If chat is open, useEffect will trigger initializeWebLLM which will set loading states.
+				// We can set a temporary message.
+				setIsLoading(true);
+				setLoadingMessage("Resetting chat...");
+			} else {
+				// If chat is closed, no immediate re-initialization. Clear loading.
+				setIsLoading(false);
+				setLoadingMessage("");
+			}
+		}
+	};
 
-		// Short delay for visual feedback before clearing loading state
-		setTimeout(() => {
-			setIsLoading(false);
-			setLoadingMessage("");
-		}, 300);
+	const handleModelChangeRequest = (newModelId) => {
+		if (newModelId === selectedModelId) return;
+		const newModel = MODELS.find((m) => m.id === newModelId);
+		if (newModel) {
+			setModelChangeConfirmation({
+				open: true,
+				newModelId: newModel.id,
+				newModelName: newModel.name,
+			});
+		}
+	};
+
+	const handleConfirmModelChange = async (confirm) => {
+		const { newModelId } = modelChangeConfirmation;
+		setModelChangeConfirmation({
+			open: false,
+			newModelId: null,
+			newModelName: "",
+		}); // Close dialog
+
+		if (confirm && newModelId) {
+			setSelectedModelId(newModelId);
+			await handleResetChat(true); // Pass true to indicate it's part of model change
+			// initializeWebLLM will be called by useEffect
+		}
 	};
 
 	// Function to handle user confirmation (Yes/No) - ADJUSTED
@@ -480,8 +627,8 @@ export default function Chatbot() {
 	const sendMessageToLLM = useCallback(
 		async (userMessageContent) => {
 			// userMessageContent is the text from the user input/suggestion
-			if (!engine) {
-				// ... (no change) ...
+			if (!engine || !isReady) {
+				// Added !isReady check
 				setError("AI Assistant is not ready yet.");
 				setMessages((prev) => [
 					...prev,
@@ -501,10 +648,17 @@ export default function Chatbot() {
 			let placeholderIndex = -1;
 
 			try {
+				// Determine the number of previous messages to include
+				const numPreviousMessagesToInclude = CONTEXT_WINDOW_SIZE - 1; // Always use CONTEXT_WINDOW_SIZE - 1
+
 				// Get previous messages snapshot, excluding system messages
-				const previousMessages = messagesRef.current
-					.filter((msg) => msg.role !== "system")
-					.slice(-(CONTEXT_WINDOW_SIZE - 1)); // Get N-1 previous messages for context
+				const allNonSystemMessages = messagesRef.current.filter(
+					(msg) => msg.role !== "system"
+				);
+				const previousMessages =
+					numPreviousMessagesToInclude > 0
+						? allNonSystemMessages.slice(-numPreviousMessagesToInclude)
+						: [];
 
 				const systemPrompt = generateSystemPrompt(
 					currentSection,
@@ -800,6 +954,7 @@ export default function Chatbot() {
 			CONTEXT_WINDOW_SIZE,
 			generateSystemPrompt,
 			setTheme,
+			isReady, // Added isReady
 			// Removed pendingAction dependency here as it's cleared immediately now
 		]
 	);
@@ -863,7 +1018,7 @@ export default function Chatbot() {
 								</Button>
 							</TooltipTrigger>
 							{/* Use a much higher z-index */}
-							<TooltipContent side="left" className="z-[9999]">
+							<TooltipContent side="bottom" className="z-[9999]">
 								<p>Talk to Varun's AI Assistant</p>
 							</TooltipContent>
 						</Tooltip>
@@ -885,57 +1040,138 @@ export default function Chatbot() {
 					>
 						{/* Added subtle gradient background to the card */}
 						<Card className="h-full w-full flex flex-col shadow-2xl border-primary/30 rounded-none overflow-hidden bg-gradient-to-br from-background via-background to-muted/20 md:rounded-xl md:w-[25vw] md:h-[50vh]">
-							{" "}
-							{/* Use fixed pixel dimensions */} {/* Adjusted desktop size */}
-							{/* Header with gradient */}
-							<CardHeader className="flex flex-row items-center justify-between p-4 border-b bg-gradient-to-r from-purple-600/10 to-pink-600/10 backdrop-blur-sm">
-								<div className="flex items-center gap-3">
-									<SparklesIcon className="h-6 w-6 text-purple-500" />
-									<p className="font-semibold text-lg">Varun's AI Assistant</p>
+							{/* Header: Adjusted for mobile and desktop layouts */}
+							<CardHeader className="flex flex-row items-center justify-between p-3 border-b bg-gradient-to-r from-purple-600/10 to-pink-600/10 backdrop-blur-sm">
+								{/* Title Section: 50% width on mobile, auto on desktop */}
+								<div className="flex items-center gap-2 w-1/2 sm:w-auto truncate">
+									<SparklesIcon className="h-5 w-5 text-purple-500 flex-shrink-0" />
+									<p className="font-semibold text-md truncate">
+										Varun's AI Assistant
+									</p>
 								</div>
-								{/* Buttons remain the same */}
-								<div className="flex items-center gap-1">
+
+								{/* Controls Section: 50% width on mobile, auto on desktop. Uses flex to distribute children. */}
+								<div className="flex items-center justify-end gap-x-1 w-1/2 sm:w-auto">
+									{/* Model Select Dropdown Wrapper for layout */}
+									<div className="basis-[70%] sm:basis-auto">
+										<Select
+											value={selectedModelId}
+											onValueChange={handleModelChangeRequest}
+											disabled={isLoading || isInitializing.current}
+										>
+											<Tooltip>
+												<TooltipTrigger asChild>
+													<SelectTrigger className="w-full h-8 text-xs px-2 py-1 focus:ring-purple-500 border-primary/20 truncate sm:w-auto">
+														<CpuIcon className="h-3 w-3 mr-1 opacity-70 flex-shrink-0" />
+														<SelectValue
+															placeholder="Select Model"
+															className="truncate"
+														/>
+													</SelectTrigger>
+												</TooltipTrigger>
+												<TooltipContent
+													side="bottom"
+													sideOffset={5}
+													className="z-[9999]"
+												>
+													Select AI Model
+												</TooltipContent>
+											</Tooltip>
+											<SelectContent className="z-[9999]">
+												{" "}
+												{/* Ensure high z-index */}
+												<SelectGroup>
+													<SelectLabel className="text-xs">
+														Available Models
+													</SelectLabel>
+													{MODELS.map((model) => {
+														const ModelIcon = model.icon;
+														const isDisabled =
+															isLoading ||
+															isInitializing.current ||
+															(isMobile && !model.mobileFriendly);
+														return (
+															<SelectItem
+																key={model.id}
+																value={model.id}
+																disabled={isDisabled}
+																className={`text-xs ${
+																	isDisabled
+																		? "opacity-50 cursor-not-allowed"
+																		: ""
+																}`}
+															>
+																<div className="flex items-center gap-2">
+																	<ModelIcon
+																		className={`h-3 w-3 ${
+																			isDisabled
+																				? "text-muted-foreground"
+																				: "text-primary"
+																		}`}
+																	/>
+																	<span>{model.name}</span>
+																	{isMobile && !model.mobileFriendly && (
+																		<span className="text-xs opacity-70 ml-1">
+																			(Desktop Only)
+																		</span>
+																	)}
+																</div>
+															</SelectItem>
+														);
+													})}
+												</SelectGroup>
+											</SelectContent>
+										</Select>
+									</div>
+									{/* Reset Button: basis-[15%] (7.5% of total) on mobile */}
 									<Tooltip>
-										<TooltipTrigger asChild>
+										<TooltipTrigger
+											asChild
+											className="basis-[15%] sm:basis-auto"
+										>
+											{/* Button needs w-full to fill its parent TooltipTrigger's basis */}
 											<Button
 												variant="ghost"
 												size="icon"
-												className="w-8 h-8 rounded-full hover:bg-muted/50"
-												onClick={handleResetChat}
-												disabled={isLoading} // Only disable if actively loading
+												className="w-full h-8 rounded-full hover:bg-muted/50 sm:w-8"
+												onClick={() => handleResetChat(false)}
+												disabled={isLoading && !isInitializing.current}
 												aria-label="Reset Chat"
 											>
 												<RotateCcwIcon className="h-4 w-4" />
 											</Button>
 										</TooltipTrigger>
-										{/* Use a much higher z-index */}
 										<TooltipContent
-											side="top"
+											side="bottom"
 											sideOffset={5}
 											className="z-[9999]"
 										>
-											<p>Reset Chat</p>
+											Reset Chat
 										</TooltipContent>
 									</Tooltip>
+									{/* Close Button: basis-[15%] (7.5% of total) on mobile */}
 									<Tooltip>
-										<TooltipTrigger asChild>
+										<TooltipTrigger
+											asChild
+											className="basis-[15%] sm:basis-auto"
+										>
+											{/* Button needs w-full to fill its parent TooltipTrigger's basis */}
 											<Button
 												variant="ghost"
 												size="icon"
-												className="w-8 h-8 rounded-full hover:bg-muted/50"
+												className="w-full h-8 rounded-full hover:bg-muted/50 sm:w-8"
 												onClick={handleCloseChat}
 												aria-label="Close Chat"
 											>
 												<CloseIcon className="h-4 w-4" />
 											</Button>
 										</TooltipTrigger>
-										{/* Use a much higher z-index */}
 										<TooltipContent
-											side="top"
+											side="bottom"
 											sideOffset={5}
 											className="z-[9999]"
 										>
-											<p>Close</p>
+											Close
 										</TooltipContent>
 									</Tooltip>
 								</div>
@@ -1120,6 +1356,43 @@ export default function Chatbot() {
 					</motion.div>
 				)}
 			</AnimatePresence>
+
+			{/* Model Change Confirmation Dialog */}
+			<AlertDialog
+				open={modelChangeConfirmation.open}
+				onOpenChange={(isOpen) =>
+					!isOpen &&
+					setModelChangeConfirmation({
+						open: false,
+						newModelId: null,
+						newModelName: "",
+					})
+				}
+			>
+				<AlertDialogContent className="z-[150]">
+					{" "}
+					{/* Added z-index */}
+					<AlertDialogHeader>
+						<AlertDialogTitle>Confirm Model Change</AlertDialogTitle>
+						<AlertDialogDescription>
+							Are you sure you want to change the AI model to "
+							{modelChangeConfirmation.newModelName}"? This will reset your
+							current chat session and load the new model.
+						</AlertDialogDescription>
+					</AlertDialogHeader>
+					<AlertDialogFooter>
+						<AlertDialogCancel onClick={() => handleConfirmModelChange(false)}>
+							Cancel
+						</AlertDialogCancel>
+						<AlertDialogAction
+							onClick={() => handleConfirmModelChange(true)}
+							className="bg-primary hover:bg-primary/90"
+						>
+							Confirm & Reload
+						</AlertDialogAction>
+					</AlertDialogFooter>
+				</AlertDialogContent>
+			</AlertDialog>
 		</TooltipProvider>
 	);
 }
