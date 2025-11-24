@@ -174,22 +174,15 @@ export default function Hero() {
 								<a href="#projects">View My Work</a>
 							</Button>
 
-							{/* Tooltip for Download Resume */}
-							<Tooltip>
-								{/* Attach trigger directly to the button */}
-								<TooltipTrigger asChild>
-									<Button
-										size="lg"
-										variant="outline"
-										onClick={(e) => e.preventDefault()}
-									>
-										Download Resume
-									</Button>
-								</TooltipTrigger>
-								<TooltipContent>
-									<p>Updation in Progress!</p>
-								</TooltipContent>
-							</Tooltip>
+							<Button
+								size="lg"
+								variant="outline"
+								asChild
+							>
+								<a href="/Varun_Resume.pdf" target="_blank" rel="noopener noreferrer">
+									Download Resume
+								</a>
+							</Button>
 						</motion.div>
 					</TooltipProvider>
 				</div>
