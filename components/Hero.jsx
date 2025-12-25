@@ -7,6 +7,10 @@ import {
 	MousePointer2Icon,
 	MoveIcon,
 	ZoomInIcon,
+	GithubIcon,
+	LinkedinIcon,
+	TwitterIcon,
+	MapPinIcon,
 } from "lucide-react";
 import HeroCanvas from "./HeroCanvas";
 import { Suspense, useState, useEffect } from "react";
@@ -147,6 +151,78 @@ export default function Hero() {
 							{portfolioData.name} {/* Use data from import */}
 						</span>
 					</motion.h1>
+
+					{/* Location */}
+					<motion.p
+						initial={{ opacity: 0, y: 20 }}
+						animate={{ opacity: 1, y: 0 }}
+						transition={{ duration: 0.5, delay: 0.3 }}
+						className="text-sm md:text-base text-muted-foreground mb-2 flex items-center gap-2 justify-center md:justify-start"
+					>
+						<MapPinIcon className="h-4 w-4" />
+						<span>Mumbai, India</span>
+					</motion.p>
+
+					{/* Social Links */}
+					<TooltipProvider>
+						<motion.div
+							initial={{ opacity: 0, y: 20 }}
+							animate={{ opacity: 1, y: 0 }}
+							transition={{ duration: 0.5, delay: 0.35 }}
+							className="flex items-center gap-3 mb-4"
+						>
+							<Tooltip>
+								<TooltipTrigger asChild>
+									<a
+										href={portfolioData.contact.github}
+										target="_blank"
+										rel="noreferrer"
+										aria-label="GitHub"
+										className="inline-flex items-center justify-center h-10 w-10 rounded-full border border-border bg-background hover:bg-muted transition-colors"
+									>
+										<GithubIcon className="h-5 w-5" />
+									</a>
+								</TooltipTrigger>
+								<TooltipContent>
+									<p>GitHub</p>
+								</TooltipContent>
+							</Tooltip>
+
+							<Tooltip>
+								<TooltipTrigger asChild>
+									<a
+										href={portfolioData.contact.linkedin}
+										target="_blank"
+										rel="noreferrer"
+										aria-label="LinkedIn"
+										className="inline-flex items-center justify-center h-10 w-10 rounded-full border border-border bg-background hover:bg-muted transition-colors"
+									>
+										<LinkedinIcon className="h-5 w-5" />
+									</a>
+								</TooltipTrigger>
+								<TooltipContent>
+									<p>LinkedIn</p>
+								</TooltipContent>
+							</Tooltip>
+
+							<Tooltip>
+								<TooltipTrigger asChild>
+									<a
+										href={portfolioData.contact.twitter}
+										target="_blank"
+										rel="noreferrer"
+										aria-label="Twitter"
+										className="inline-flex items-center justify-center h-10 w-10 rounded-full border border-border bg-background hover:bg-muted transition-colors"
+									>
+										<TwitterIcon className="h-5 w-5" />
+									</a>
+								</TooltipTrigger>
+								<TooltipContent>
+									<p>Twitter</p>
+								</TooltipContent>
+							</Tooltip>
+						</motion.div>
+					</TooltipProvider>
 
 					{/* Paragraph */}
 					<motion.p
