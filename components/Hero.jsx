@@ -147,7 +147,7 @@ export default function Hero() {
 						className="text-4xl lg:text-6xl font-bold tracking-tighter mb-4 text-shadow-lg"
 					>
 						Hi, I'm{" "}
-						<span className="bg-gradient-to-r from-purple-600 to-pink-600 text-transparent bg-clip-text">
+						<span className="bg-gradient-to-r from-mass-effect-blue to-mass-effect-red text-transparent bg-clip-text">
 							{portfolioData.name} {/* Use data from import */}
 						</span>
 					</motion.h1>
@@ -244,8 +244,8 @@ export default function Hero() {
 						>
 							<Button
 								size="lg"
-								className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
-								asChild
+						className="bg-gradient-to-r from-mass-effect-blue to-mass-effect-red hover:from-[#0a3a70] hover:to-[#a80215]"
+						asChild
 							>
 								<a href="#projects">View My Work</a>
 							</Button>

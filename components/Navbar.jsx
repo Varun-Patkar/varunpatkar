@@ -47,7 +47,7 @@ export default function Navbar() {
 				{/* Use <a> tag for the logo link as well */}
 				<a
 					href="#hero"
-					className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 text-transparent bg-clip-text"
+					className="text-2xl font-bold bg-gradient-to-r from-mass-effect-blue to-mass-effect-red text-transparent bg-clip-text"
 				>
 					{portfolioData.name} {/* Use data from import */}
 				</a>

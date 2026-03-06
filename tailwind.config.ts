@@ -20,6 +20,8 @@ const config: Config = {
         sm: 'calc(var(--radius) - 4px)',
       },
       colors: {
+        'mass-effect-blue': '#0E4C92',
+        'mass-effect-red': '#d8031c',
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
         card: {

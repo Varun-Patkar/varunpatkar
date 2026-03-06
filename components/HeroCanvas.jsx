@@ -22,8 +22,8 @@ function Model({ theme, ...props }) {
 	// Effect to change material color/shader based on theme
 	useEffect(() => {
 		if (scene) {
-			const colorPink = new THREE.Color("#db2777");
-			const colorPurple = new THREE.Color("#9333ea");
+			const colorBlue = new THREE.Color("#0E4C92"); // Mass Effect Blue
+			const colorRed = new THREE.Color("#d8031c"); // Mass Effect Red
 			const colorWhite = new THREE.Color("white");
 
 			scene.traverse((child) => {
@@ -67,8 +67,8 @@ function Model({ theme, ...props }) {
 
 						targetMaterial.onBeforeCompile = (shader) => {
 							// Add uniforms for gradient colors
-							shader.uniforms.colorA = { value: colorPink };
-							shader.uniforms.colorB = { value: colorPurple };
+							shader.uniforms.colorA = { value: colorBlue };
+							shader.uniforms.colorB = { value: colorRed };
 							shader.uniforms.bboxMin = { value: new THREE.Vector3() };
 							shader.uniforms.bboxMax = { value: new THREE.Vector3() };
 

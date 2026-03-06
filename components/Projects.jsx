@@ -44,7 +44,7 @@ export default function Projects() {
 					<h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-2">
 						Featured Projects
 					</h2>
-					<Separator className="w-20 h-1 bg-gradient-to-r from-purple-600 to-pink-600 mx-auto" />
+				<Separator className="w-20 h-1 bg-gradient-to-r from-mass-effect-blue to-mass-effect-red mx-auto" />
 					<p className="mt-4 text-muted-foreground max-w-2xl mx-auto">
 						Explore some of my recent work and projects I've built using various
 						technologies.
@@ -73,7 +73,7 @@ export default function Projects() {
 									<CardTitle className="text-xl font-bold">
 										{project.title}
 									</CardTitle>
-									<CardDescription className="line-clamp-2">
+									<CardDescription>
 										{project.description}
 									</CardDescription>
 								</CardHeader>
@@ -131,7 +131,7 @@ export default function Projects() {
 									{project.liveLink && ( // Simplified check
 										<Button
 											size="sm"
-											className="flex-1 min-w-[100px] bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+											className="flex-1 min-w-[100px] bg-gradient-to-r from-mass-effect-blue to-mass-effect-red hover:from-[#0a3a70] hover:to-[#a80215]"
 											asChild
 										>
 											<a

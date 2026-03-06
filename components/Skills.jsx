@@ -34,7 +34,7 @@ export default function Skills() {
 					<h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-2">
 						My Skills
 					</h2>
-					<Separator className="w-20 h-1 bg-gradient-to-r from-purple-600 to-pink-600 mx-auto" />
+				<Separator className="w-20 h-1 bg-gradient-to-r from-mass-effect-blue to-mass-effect-red mx-auto" />
 					<p className="mt-4 text-muted-foreground max-w-2xl mx-auto">
 						My technical expertise spans data engineering, analysis, and web
 						development.
@@ -52,7 +52,7 @@ export default function Skills() {
 					{portfolioData.skills.map((category, index) => (
 						<motion.div key={index} variants={item}>
 							<Card className="p-6 h-full hover:shadow-lg transition-shadow">
-								<h3 className="text-xl font-semibold mb-4 bg-gradient-to-r from-purple-600 to-pink-600 text-transparent bg-clip-text">
+						<h3 className="text-xl font-semibold mb-4 bg-gradient-to-r from-mass-effect-blue to-mass-effect-red text-transparent bg-clip-text">
 									{category.category} {/* Use category.category */}
 								</h3>
 								<div className="space-y-4">
@@ -71,7 +71,7 @@ export default function Skills() {
 													whileInView={{ width: `${skill.level}%` }}
 													viewport={{ once: true }}
 													transition={{ duration: 1, delay: 0.2 }}
-													className="h-full bg-gradient-to-r from-purple-600 to-pink-600 rounded-full"
+												className="h-full bg-gradient-to-r from-mass-effect-blue to-mass-effect-red rounded-full"
 												/>
 											</div>
 										</div>

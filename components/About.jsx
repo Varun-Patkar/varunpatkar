@@ -18,10 +18,13 @@ export default function About() {
 					<h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-2">
 						About Me
 					</h2>
-					<Separator className="w-20 h-1 bg-gradient-to-r from-purple-600 to-pink-600 mx-auto" />
-				</motion.div>
+				<Separator className="w-20 h-1 bg-gradient-to-r from-mass-effect-blue to-mass-effect-red mx-auto" />
+				<p className="mt-4 text-muted-foreground max-w-2xl mx-auto">
+					Learn more about my background, skills, and passion for technology.
+				</p>
+			</motion.div>
 
-				<div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+			<div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
 					<motion.div
 						initial={{ opacity: 0, x: -20 }}
 						whileInView={{ opacity: 1, x: 0 }}
@@ -62,7 +65,7 @@ export default function About() {
 
 						<div className="flex flex-wrap gap-4 pt-2">
 							<div className="flex flex-col">
-								<span className="text-3xl font-bold text-purple-600 dark:text-purple-400">
+								<span className="text-3xl font-bold text-mass-effect-blue dark:text-[#4A9FD8]">
 									{portfolioData.about.yearsExperience} {/* Use data */}
 								</span>
 								<span className="text-sm text-muted-foreground">
@@ -70,7 +73,7 @@ export default function About() {
 								</span>
 							</div>
 							<div className="flex flex-col">
-								<span className="text-3xl font-bold text-pink-600 dark:text-pink-400">
+								<span className="text-3xl font-bold text-mass-effect-red dark:text-[#ff5c6f]">
 									{portfolioData.about.projectsCompleted} {/* Use data */}
 								</span>
 								<span className="text-sm text-muted-foreground">

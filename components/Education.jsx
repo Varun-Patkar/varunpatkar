@@ -41,7 +41,7 @@ export default function Education() {
 					<h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-2">
 						Education
 					</h2>
-					<Separator className="w-20 h-1 bg-gradient-to-r from-purple-600 to-pink-600 mx-auto" />
+				<Separator className="w-20 h-1 bg-gradient-to-r from-mass-effect-blue to-mass-effect-red mx-auto" />
 					<p className="mt-4 text-muted-foreground max-w-2xl mx-auto">
 						My academic background and educational qualifications.
 					</p>
@@ -59,7 +59,7 @@ export default function Education() {
 						<motion.div key={index} variants={item}>
 							<Card className="hover:shadow-lg transition-shadow overflow-hidden">
 								<CardHeader className="pb-2 flex flex-row items-start gap-4">
-									<div className="rounded-full p-2 w-10 h-10 flex items-center justify-center bg-gradient-to-r from-purple-600 to-pink-600 text-white">
+							<div className="rounded-full p-2 w-10 h-10 flex items-center justify-center bg-gradient-to-r from-mass-effect-blue to-mass-effect-red text-white">
 										<GraduationCapIcon className="h-5 w-5" />
 									</div>
 									<div className="space-y-1">
@@ -91,7 +91,7 @@ export default function Education() {
 
 									<div className="text-sm font-medium">
 										CGPA: {/* Changed label */}
-										<span className="text-purple-600 dark:text-purple-400">
+									<span className="text-mass-effect-blue dark:text-[#4A9FD8]">
 											{education.gpa}
 										</span>
 									</div>

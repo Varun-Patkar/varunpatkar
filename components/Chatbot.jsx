@@ -1104,7 +1104,7 @@ export default function Chatbot() {
 							<TooltipTrigger asChild>
 								<Button
 									size="icon"
-									className="rounded-full w-16 h-16 shadow-lg bg-gradient-to-br from-purple-600 via-pink-600 to-purple-600 hover:shadow-xl text-white flex items-center justify-center transition-all duration-300 hover:scale-105" // Slightly larger, gradient, hover effect
+									className="rounded-full w-16 h-16 shadow-lg bg-gradient-to-br from-mass-effect-blue to-mass-effect-red hover:shadow-xl text-white flex items-center justify-center transition-all duration-300 hover:scale-105" // Slightly larger, gradient, hover effect
 									onClick={handleOpenChat}
 									aria-label="Open Chat"
 								>
@@ -1136,10 +1136,10 @@ export default function Chatbot() {
 						{/* Added subtle gradient background to the card */}
 						<Card className="h-full w-full flex flex-col shadow-2xl border-primary/30 rounded-none overflow-hidden bg-gradient-to-br from-background via-background to-muted/20 md:rounded-xl md:w-[25vw] md:h-[50vh]">
 							{/* Header: Adjusted for mobile and desktop layouts */}
-							<CardHeader className="flex flex-row items-center justify-between p-3 border-b bg-gradient-to-r from-purple-600/10 to-pink-600/10 backdrop-blur-sm">
+							<CardHeader className="flex flex-row items-center justify-between p-3 border-b bg-gradient-to-r from-mass-effect-blue/10 to-mass-effect-red/10 backdrop-blur-sm">
 								{/* Title Section: 50% width on mobile, auto on desktop */}
 								<div className="flex items-center gap-2 w-1/2 sm:w-auto truncate">
-									<SparklesIcon className="h-5 w-5 text-purple-500 flex-shrink-0" />
+									<SparklesIcon className="h-5 w-5 text-[#0E4C92] dark:text-[#4A9FD8] flex-shrink-0" />
 									<p className="font-semibold text-md truncate">
 										Varun's AI Assistant
 									</p>
@@ -1156,7 +1156,7 @@ export default function Chatbot() {
 										>
 											<Tooltip>
 												<TooltipTrigger asChild>
-													<SelectTrigger className="w-full h-8 text-xs px-2 py-1 focus:ring-purple-500 border-primary/20 truncate sm:w-auto">
+													<SelectTrigger className="w-full h-8 text-xs px-2 py-1 focus:ring-[#0E4C92] border-primary/20 truncate sm:w-auto">
 														<CpuIcon className="h-3 w-3 mr-1 opacity-70 flex-shrink-0" />
 														<SelectValue
 															placeholder="Select Model"
@@ -1288,7 +1288,7 @@ export default function Chatbot() {
 										>
 											{msg.role === "assistant" && (
 												// ... existing assistant icon div ...
-												<div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-purple-600 to-pink-600 text-white flex items-center justify-center shadow-md">
+												<div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-mass-effect-blue to-mass-effect-red text-white flex items-center justify-center shadow-md">
 													<SparklesIcon className="h-4 w-4" />
 												</div>
 											)}
@@ -1301,7 +1301,7 @@ export default function Chatbot() {
 													msg.role === "user"
 														? "bg-primary text-primary-foreground rounded-br-none" // User style
 														: isAgenticPlaceholder
-														? "bg-gradient-to-r from-purple-600/20 to-pink-600/20 text-muted-foreground italic rounded-bl-none animate-pulse" // Agentic placeholder style
+														? "bg-gradient-to-r from-mass-effect-blue/20 to-mass-effect-red/20 text-muted-foreground italic rounded-bl-none animate-pulse" // Agentic placeholder style
 														: "bg-muted text-foreground rounded-bl-none" // Normal assistant style
 												}`}
 											>
@@ -1347,7 +1347,7 @@ export default function Chatbot() {
 																	key={sIndex}
 																	size="sm"
 																	variant="outline"
-																	className="text-xs h-auto py-1 px-2 border-purple-400/50 text-purple-700 dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-900/30"
+																	className="text-xs h-auto py-1 px-2 border-[#0E4C92]/50 text-[#0E4C92] dark:text-[#4A9FD8] hover:bg-[#0E4C92]/10 dark:hover:bg-[#0E4C92]/30"
 																	onClick={() =>
 																		handleSuggestionClick(suggestion.trigger)
 																	}
@@ -1409,7 +1409,7 @@ export default function Chatbot() {
 														repeat: Infinity,
 														ease: "linear",
 													}}
-													className="w-5 h-5 border-2 border-purple-400 border-t-transparent rounded-full mr-3" // Adjusted spinner
+													className="w-5 h-5 border-2 border-[#0E4C92] border-t-transparent rounded-full mr-3" // Adjusted spinner
 												/>
 												{loadingMessage}
 											</>
@@ -1447,13 +1447,13 @@ export default function Chatbot() {
 										disabled={
 											isLoading || !engine || !isReady || !!pendingAction
 										}
-										className="flex-1 rounded-full px-4 py-2 border-primary/20 focus-visible:ring-purple-500" // Rounded input
+										className="flex-1 rounded-full px-4 py-2 border-primary/20 focus-visible:ring-[#0E4C92]" // Rounded input
 										aria-label="Chat input"
 									/>
 									<Button
 										type="submit"
 										size="icon"
-										className="rounded-full w-10 h-10 bg-gradient-to-r from-purple-600 to-pink-600 hover:opacity-90 transition-opacity disabled:opacity-50" // Gradient button
+										className="rounded-full w-10 h-10 bg-gradient-to-r from-mass-effect-blue to-mass-effect-red hover:opacity-90 transition-opacity disabled:opacity-50" // Gradient button
 										disabled={
 											isLoading ||
 											!engine ||

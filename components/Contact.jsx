@@ -141,7 +141,7 @@ export default function Contact() {
 					<h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-2">
 						Get In Touch
 					</h2>
-					<Separator className="w-20 h-1 bg-gradient-to-r from-purple-600 to-pink-600 mx-auto" />
+				<Separator className="w-20 h-1 bg-gradient-to-r from-mass-effect-blue to-mass-effect-red mx-auto" />
 					<p className="mt-4 text-muted-foreground max-w-2xl mx-auto">
 						Have a question or want to work together? Feel free to reach out to
 						me.
@@ -163,7 +163,7 @@ export default function Contact() {
 									</h3>
 									<div className="space-y-4">
 										<div className="flex items-start">
-											<div className="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 text-white flex items-center justify-center mr-4">
+									<div className="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-r from-mass-effect-blue to-mass-effect-red text-white flex items-center justify-center mr-4">
 												<PhoneIcon className="h-5 w-5" />
 											</div>
 											<div>
@@ -175,7 +175,7 @@ export default function Contact() {
 										</div>
 
 										<div className="flex items-start">
-											<div className="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 text-white flex items-center justify-center mr-4">
+									<div className="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-r from-mass-effect-blue to-mass-effect-red text-white flex items-center justify-center mr-4">
 												<MailIcon className="h-5 w-5" />
 											</div>
 											<div>
@@ -187,7 +187,7 @@ export default function Contact() {
 										</div>
 
 										<div className="flex items-start">
-											<div className="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 text-white flex items-center justify-center mr-4">
+									<div className="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-r from-mass-effect-blue to-mass-effect-red text-white flex items-center justify-center mr-4">
 												<MapPinIcon className="h-5 w-5" />
 											</div>
 											<div>
@@ -327,7 +327,7 @@ export default function Contact() {
 									<Button
 										id="contact-submit" // Add ID
 										type="submit"
-										className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+									className="w-full bg-gradient-to-r from-mass-effect-blue to-mass-effect-red hover:from-[#0a3a70] hover:to-[#a80215]"
 										disabled={status === "Sending..."} // Disable button while sending
 									>
 										{status === "Sending..." ? "Sending..." : "Send Message"}
