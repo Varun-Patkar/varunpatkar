@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import HeroCanvas from "./HeroCanvas";
 import { Suspense, useState, useEffect } from "react";
+import Link from "next/link";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { useTheme } from "next-themes";
@@ -255,9 +256,9 @@ export default function Hero() {
 								variant="outline"
 								asChild
 							>
-								<a href="/Varun_Resume.pdf" target="_blank" rel="noopener noreferrer">
-									Download Resume
-								</a>
+								<Link href="/resume">
+									View Resume
+								</Link>
 							</Button>
 						</motion.div>
 					</TooltipProvider>

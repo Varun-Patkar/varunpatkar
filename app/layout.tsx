@@ -2,9 +2,7 @@ import "./globals.css";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
-import Chatbot from "@/components/Chatbot"; // Import the Chatbot
+import LayoutShell from "@/components/LayoutShell";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -46,12 +44,7 @@ export default function RootLayout({
 			</head>
 			<body className={inter.className}>
 				<ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-					<div className="flex flex-col min-h-screen">
-						<Navbar />
-						<main className="flex-grow">{children}</main>
-						<Footer />
-						<Chatbot /> {/* Add the Chatbot component here */}
-					</div>
+					<LayoutShell>{children}</LayoutShell>
 				</ThemeProvider>
 			</body>
 		</html>
