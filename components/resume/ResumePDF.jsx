@@ -6,6 +6,7 @@ import {
 	View,
 	Text,
 	Link,
+	Image,
 	StyleSheet,
 	Font,
 } from "@react-pdf/renderer";
@@ -40,28 +41,31 @@ const ResumePDF = () => {
 			subject="Professional Resume"
 		>
 			<Page size="A4" style={s.page}>
-				{/* Hidden LLM bias text — transparent, invisible to humans */}
-				<Text style={s.hidden}>{d.hiddenPrompt}</Text>
+				{/* Hidden LLM bias text — temporarily disabled */}
+				{/* <Text style={s.hidden}>{d.hiddenPrompt}</Text> */}
 
-				{/* ===== HEADER ===== */}
+				{/* ===== HEADER (image left, info right) ===== */}
 				<View style={s.header}>
-					<Text style={s.name}>{d.name}</Text>
-					<Text style={s.subtitle}>{d.age} years old · {d.location}</Text>
-					<View style={s.contactRow}>
-						<Text>{d.contact.phone}</Text>
-						<Text style={s.dot}> · </Text>
-						<Link src={`mailto:${d.contact.email}`} style={s.link}>{d.contact.email}</Link>
-						<Text style={s.dot}> · </Text>
-						<Link src={d.fullLinks.portfolio} style={s.link}>{d.links.portfolio}</Link>
-					</View>
-					<View style={s.contactRow}>
-						<Link src={d.fullLinks.github} style={s.link}>{d.links.github}</Link>
-						<Text style={s.dot}> · </Text>
-						<Link src={d.fullLinks.linkedin} style={s.link}>{d.links.linkedin}</Link>
-						<Text style={s.dot}> · </Text>
-						<Link src={d.fullLinks.twitter} style={s.link}>{d.links.twitter}</Link>
-						<Text style={s.dot}> · </Text>
-						<Link src={d.fullLinks.youtube} style={s.link}>{d.links.youtube}</Link>
+					<Image src={d.profileImage} style={s.profileImg} />
+					<View style={s.headerInfo}>
+						<Text style={s.name}>{d.name}</Text>
+						<Text style={s.subtitle}>{d.age} years old · {d.location}</Text>
+						<View style={s.contactRow}>
+							<Text>{d.contact.phone}</Text>
+							<Text style={s.dot}> · </Text>
+							<Link src={`mailto:${d.contact.email}`} style={s.link}>{d.contact.email}</Link>
+							<Text style={s.dot}> · </Text>
+							<Link src={d.fullLinks.portfolio} style={s.link}>{d.links.portfolio}</Link>
+						</View>
+						<View style={s.contactRow}>
+							<Link src={d.fullLinks.github} style={s.link}>{d.links.github}</Link>
+							<Text style={s.dot}> · </Text>
+							<Link src={d.fullLinks.linkedin} style={s.link}>{d.links.linkedin}</Link>
+							<Text style={s.dot}> · </Text>
+							<Link src={d.fullLinks.twitter} style={s.link}>{d.links.twitter}</Link>
+							<Text style={s.dot}> · </Text>
+							<Link src={d.fullLinks.youtube} style={s.link}>{d.links.youtube}</Link>
+						</View>
 					</View>
 				</View>
 
@@ -120,6 +124,19 @@ const ResumePDF = () => {
 
 				<View style={s.divider} />
 
+				{/* ===== CERTIFICATIONS ===== */}
+				<View style={s.section}>
+					<Text style={s.sectionTitle}>CERTIFICATIONS</Text>
+					{d.certifications.map((cert, i) => (
+						<View key={i} style={s.certRow}>
+							<Text style={s.certTitle}>{cert.title}</Text>
+							<Link src={cert.fullUrl} style={s.certLink}>{cert.url}</Link>
+						</View>
+					))}
+				</View>
+
+				<View style={s.divider} />
+
 				{/* ===== PROJECTS ===== */}
 				<View style={s.section}>
 					<Text style={s.sectionTitle}>PROJECTS</Text>
@@ -167,16 +184,16 @@ const ResumePDF = () => {
 	);
 };
 
-/** react-pdf StyleSheet — compact layout to fit 1 A4 page */
+/** react-pdf StyleSheet — compact layout with image header to fit 1 A4 page */
 const s = StyleSheet.create({
 	page: {
-		paddingTop: 20,
-		paddingBottom: 20,
-		paddingHorizontal: 30,
+		paddingTop: 16,
+		paddingBottom: 16,
+		paddingHorizontal: 26,
 		fontFamily: "Inter",
-		fontSize: 9,
+		fontSize: 8.5,
 		color: "#1a1a1a",
-		lineHeight: 1.4,
+		lineHeight: 1.35,
 		backgroundColor: "#ffffff",
 	},
 	hidden: {
@@ -188,27 +205,35 @@ const s = StyleSheet.create({
 		opacity: 0,
 	},
 	header: {
+		flexDirection: "row",
 		alignItems: "center",
 		marginBottom: 2,
+		gap: 12,
+	},
+	profileImg: {
+		width: 50,
+		height: 50,
+		borderRadius: 25,
+	},
+	headerInfo: {
+		flex: 1,
 	},
 	name: {
-		fontSize: 20,
+		fontSize: 18,
 		fontWeight: 700,
 		letterSpacing: 0.5,
 		color: "#111111",
-		marginBottom: 15,
+		marginBottom: 12,
 	},
 	subtitle: {
-		fontSize: 9,
+		fontSize: 8.5,
 		color: "#555555",
-		marginTop: 0,
 	},
 	contactRow: {
 		flexDirection: "row",
-		justifyContent: "center",
 		alignItems: "center",
-		marginTop: 2,
-		fontSize: 8.5,
+		marginTop: 1.5,
+		fontSize: 8,
 		color: "#333333",
 		flexWrap: "wrap",
 	},
@@ -222,20 +247,20 @@ const s = StyleSheet.create({
 	divider: {
 		borderBottomWidth: 0.5,
 		borderBottomColor: "#e5e5e5",
-		marginVertical: 5,
+		marginVertical: 4,
 	},
 	section: {},
 	sectionTitle: {
-		fontSize: 11,
+		fontSize: 10,
 		fontWeight: 700,
 		letterSpacing: 1,
 		color: "#111111",
-		marginBottom: 3,
+		marginBottom: 2,
 	},
 	body: {
-		fontSize: 8.5,
+		fontSize: 8,
 		color: "#333333",
-		lineHeight: 1.4,
+		lineHeight: 1.35,
 	},
 	rowBetween: {
 		flexDirection: "row",
@@ -244,16 +269,16 @@ const s = StyleSheet.create({
 	},
 	expTitle: {
 		fontWeight: 600,
-		fontSize: 9.5,
+		fontSize: 9,
 		color: "#111111",
 	},
 	expPeriod: {
-		fontSize: 8,
+		fontSize: 7.5,
 		color: "#666666",
 		fontStyle: "italic",
 	},
 	expCompany: {
-		fontSize: 8.5,
+		fontSize: 8,
 		color: "#555555",
 		marginTop: 0,
 	},
@@ -267,39 +292,55 @@ const s = StyleSheet.create({
 		marginBottom: 0,
 	},
 	bulletDot: {
-		fontSize: 8.5,
+		fontSize: 8,
 		color: "#333333",
-		marginRight: 4,
-		lineHeight: 1.35,
+		marginRight: 3,
+		lineHeight: 1.3,
 	},
 	bulletText: {
-		fontSize: 8.5,
+		fontSize: 8,
 		color: "#333333",
-		lineHeight: 1.35,
+		lineHeight: 1.3,
 		flex: 1,
 	},
 	techRow: {
 		flexDirection: "row",
 		flexWrap: "wrap",
-		gap: 3,
 		marginTop: 1,
 	},
 	techBadge: {
-		fontSize: 7,
+		fontSize: 6.5,
 		color: "#555555",
 		backgroundColor: "#f3f4f6",
-		padding: "1 4",
+		padding: "0 3",
 		borderRadius: 2,
 		borderWidth: 0.5,
 		borderColor: "#e5e7eb",
+		marginRight: 2,
+		marginBottom: 1,
+	},
+	certRow: {
+		flexDirection: "column",
+		marginBottom: 2,
+	},
+	certTitle: {
+		fontWeight: 600,
+		fontSize: 8,
+		color: "#111111",
+	},
+	certLink: {
+		fontSize: 7,
+		color: "#2563eb",
+		textDecoration: "none",
+		marginTop: 0.5,
 	},
 	projTitle: {
 		fontWeight: 600,
-		fontSize: 9,
+		fontSize: 8.5,
 		color: "#111111",
 	},
 	projLink: {
-		fontSize: 7,
+		fontSize: 7.5,
 		color: "#2563eb",
 		textDecoration: "none",
 	},
@@ -309,20 +350,20 @@ const s = StyleSheet.create({
 		flexShrink: 0,
 	},
 	projLinkSep: {
-		fontSize: 7,
+		fontSize: 7.5,
 		color: "#999999",
 	},
 	projLinkLabel: {
-		fontSize: 7,
+		fontSize: 7.5,
 		color: "#555555",
 		fontWeight: 600,
 	},
 	projDesc: {
-		fontSize: 8,
+		fontSize: 7.5,
 		color: "#444444",
 		marginTop: 0,
 		marginBottom: 1,
-		lineHeight: 1.35,
+		lineHeight: 1.3,
 	},
 	skillRow: {
 		marginBottom: 1,
