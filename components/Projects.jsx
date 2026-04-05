@@ -62,11 +62,11 @@ export default function Projects() {
 					{portfolioData.projects.map((project, index) => (
 						<motion.div key={index} variants={item} className="h-full">
 							<Card className="h-full flex flex-col group hover:shadow-lg transition-shadow overflow-hidden">
-								<div className="relative overflow-hidden h-48">
+								<div className={`relative overflow-hidden h-48 ${project.squareImage ? 'bg-black' : ''}`}>
 									<img
-										src={project.image || "/placeholder.png"} // Use placeholder if image missing
+										src={project.image || "https://placehold.co/600x400"}
 										alt={project.title}
-										className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+										className={`w-full h-full transition-transform duration-500 group-hover:scale-110 ${project.squareImage ? 'object-contain' : 'object-cover'}`}
 									/>
 								</div>
 								<CardHeader>
